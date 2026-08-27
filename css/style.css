@@ -101,3 +101,86 @@ button:hover {
     color: green;
     font-weight: bold;
 }
+
+.hero {
+    background: #1f4b99;
+    color: white;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.hero h1 {
+    font-size: 48px;
+    margin-bottom: 10px;
+}
+
+.tagline {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.description {
+    font-size: 16px;
+}
+
+.roles {
+    text-align: center;
+}
+
+.roles h2 {
+    margin-bottom: 30px;
+}
+
+.role-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+.role-card {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.role-card h3 {
+    margin-bottom: 15px;
+}
+
+.role-card p {
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.role-button {
+    display: inline-block;
+    background: #1f4b99;
+    color: white;
+    text-decoration: none;
+    padding: 12px 18px;
+    border-radius: 5px;
+}
+
+.role-button:hover {
+    opacity: 0.9;
+}
+
+footer {
+    text-align: center;
+    padding: 30px;
+    margin-top: 50px;
+    color: #666;
+}
+
+@media (max-width: 768px) {
+
+    .role-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero h1 {
+        font-size: 38px;
+    }
+
+}
