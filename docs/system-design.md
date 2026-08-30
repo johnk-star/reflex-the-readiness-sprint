@@ -18,7 +18,7 @@ The core workflow is:
 
 The delivery lifecycle is:
 
-**Open → Assigned → Picked Up → Delivered**
+**REQUESTED → ASSIGNED → PICKED_UP → DELIVERED**
 
 ---
 
@@ -78,7 +78,7 @@ The retailer creates a delivery request containing:
 - Delivery address
 - Item description
 
-A newly created delivery starts with the status **Open**.
+A newly created delivery starts with the status **REQUESTED**.
 
 ### Dispatcher
 
@@ -86,7 +86,7 @@ The dispatcher views open delivery requests and assigns a rider.
 
 The delivery then changes from:
 
-**Open → Assigned**
+**REQUESTED → ASSIGNED**
 
 ### Rider
 
@@ -95,7 +95,7 @@ progresses.
 
 The expected rider transitions are:
 
-**Assigned → Picked Up → Delivered**
+**ASSIGNED → PICKED_UP → DELIVERED**
 
 ---
 
@@ -120,25 +120,25 @@ The frontend never communicates directly with MySQL.
 
 The MVP uses four primary delivery states:
 
-- **Open** — request created but not assigned.
-- **Assigned** — dispatcher has assigned the delivery to a rider.
-- **Picked Up** — rider has collected the delivery.
-- **Delivered** — delivery has been completed.
+- **REQUESTED** — request created but not assigned.
+- **ASSIGNED** — dispatcher has assigned the delivery to a rider.
+- **PICKED_UP** — rider has collected the delivery.
+- **DELIVERED** — delivery has been completed.
 
 Expected transitions are:
 
-**Open → Assigned**
+**REQUESTED → ASSIGNED**
 
-**Assigned → Picked Up**
+**ASSIGNED → PICKED_UP**
 
-**Picked Up → Delivered**
+**PICKED_UP → DELIVERED**
 
 The backend should enforce valid state transitions rather than relying only on
 the frontend.
 
 For example:
 
-**Open → Delivered**
+**REQUESTED → DELIVERED**
 
 should be rejected because the delivery has not passed through the required
 intermediate states.
