@@ -52,7 +52,59 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="itemDescription">Item Description</label>
+                    <label for="productId">Product</label>
+
+                    <select id="productId" required>
+                        <option value="">
+                            Select a product
+                        </option>
+
+                        <option value="1">
+                            iPhone 17 Pro Max - 256GB
+                        </option>
+
+                        <option value="2">
+                            iPhone 17 Pro Max - 512GB
+                        </option>
+
+                        <option value="3">
+                            Laptop - 13-inch
+                        </option>
+
+                        <option value="4">
+                            Laptop - 15-inch
+                        </option>
+
+                        <option value="5">
+                            Laptop - 17-inch
+                        </option>
+
+                        <option value="6">
+                            Laptop Backpack - Standard
+                        </option>
+
+                        <option value="7">
+                            Laptop Backpack - Large
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="quantity">Quantity</label>
+
+                    <input
+                        type="number"
+                        id="quantity"
+                        min="1"
+                        value="1"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="itemDescription">
+                        Item Description
+                    </label>
 
                     <textarea
                         id="itemDescription"
@@ -74,7 +126,9 @@
         <section class="link-section">
             <p>
                 Dispatcher?
-                <a href="dispatcher.html">Go to Dispatcher Dashboard</a>
+                <a href="dispatcher.html">
+                    Go to Dispatcher Dashboard
+                </a>
             </p>
         </section>
 

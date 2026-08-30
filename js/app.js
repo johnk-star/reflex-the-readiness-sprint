@@ -1,8 +1,16 @@
+const API_BASE_URL = "http://localhost:3000/api";
+
+
+// ==========================================
+// RETAILER
+// CREATE DELIVERY REQUEST
+// ==========================================
+
 const deliveryForm = document.getElementById("deliveryForm");
 
 if (deliveryForm) {
 
-    deliveryForm.addEventListener("submit", function (event) {
+    deliveryForm.addEventListener("submit", async function (event) {
 
         event.preventDefault();
 
@@ -15,40 +23,121 @@ if (deliveryForm) {
         const address =
             document.getElementById("address").value.trim();
 
+        const productId =
+            Number(document.getElementById("productId").value);
+
+        const quantity =
+            Number(document.getElementById("quantity").value);
+
         const itemDescription =
             document.getElementById("itemDescription").value.trim();
 
+        const message =
+            document.getElementById("message");
+
+
+        // Validate fields
+
+        if (
+            !customerName ||
+            !customerPhone ||
+            !address ||
+            !productId ||
+            !quantity ||
+            !itemDescription
+        ) {
+
+            message.textContent =
+                "Please fill in all required fields.";
+
+            return;
+        }
+
+
+        // Data expected by the Reflex API
+
         const delivery = {
-            id: "DEL-" + Date.now(),
-            customerName: customerName,
-            customerPhone: customerPhone,
-            address: address,
-            itemDescription: itemDescription,
-            status: "OPEN",
-            riderId: null,
-            createdAt: new Date().toLocaleString()
+
+            retailer_id: 1,
+
+            customer_name: customerName,
+
+            customer_phone: customerPhone,
+
+            delivery_address: address,
+
+            item_description: itemDescription,
+
+            product_id: productId,
+
+            quantity: quantity,
+
+            created_by: 1
+
         };
 
-        const deliveries =
-            JSON.parse(localStorage.getItem("deliveries")) || [];
 
-        deliveries.push(delivery);
+        try {
 
-        localStorage.setItem(
-            "deliveries",
-            JSON.stringify(deliveries)
-        );
+            message.textContent =
+                "Creating delivery request...";
 
-        const message = document.getElementById("message");
 
-        message.textContent =
-            "Delivery request created successfully!";
+            const response = await fetch(
+                `${API_BASE_URL}/deliveries`,
+                {
+                    method: "POST",
 
-        deliveryForm.reset();
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify(delivery)
+                }
+            );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.error ||
+                    "Failed to create delivery"
+                );
+            }
+
+
+            message.textContent =
+                `Delivery #${data.delivery_id} created successfully!`;
+
+
+            deliveryForm.reset();
+
+
+        } catch (error) {
+
+            console.error(
+                "Error creating delivery:",
+                error
+            );
+
+            message.textContent =
+                "Unable to create delivery. Please check that the API is running.";
+        }
 
     });
 
 }
+
+
+
+// ==========================================
+// DISPATCHER
+// LOAD REQUESTED DELIVERIES
+// ==========================================
 
 const openDeliveriesContainer =
     document.getElementById("openDeliveries");
@@ -56,105 +145,168 @@ const openDeliveriesContainer =
 
 if (openDeliveriesContainer) {
 
-    function displayOpenDeliveries() {
 
-        const deliveries =
-            JSON.parse(localStorage.getItem("deliveries")) || [];
+    async function displayOpenDeliveries() {
 
-        const openDeliveries =
-            deliveries.filter(
-                delivery => delivery.status === "OPEN"
+        openDeliveriesContainer.innerHTML =
+            "<p>Loading delivery requests...</p>";
+
+
+        try {
+
+            const response = await fetch(
+                `${API_BASE_URL}/deliveries?status=REQUESTED`
             );
 
-        openDeliveriesContainer.innerHTML = "";
 
-        if (openDeliveries.length === 0) {
+            const deliveries =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    deliveries.error ||
+                    "Failed to load deliveries"
+                );
+            }
+
+
+            openDeliveriesContainer.innerHTML = "";
+
+
+            if (deliveries.length === 0) {
+
+                openDeliveriesContainer.innerHTML =
+                    "<p>No open delivery requests.</p>";
+
+                return;
+            }
+
+
+            deliveries.forEach(function (delivery) {
+
+                const deliveryCard =
+                    document.createElement("div");
+
+                deliveryCard.classList.add(
+                    "delivery-card"
+                );
+
+
+                deliveryCard.innerHTML = `
+
+                    <h3>
+                        Delivery #${delivery.delivery_id}
+                    </h3>
+
+                    <p>
+                        <strong>Customer:</strong>
+                        ${delivery.customer_name}
+                    </p>
+
+                    <p>
+                        <strong>Phone:</strong>
+                        ${delivery.customer_phone}
+                    </p>
+
+                    <p>
+                        <strong>Address:</strong>
+                        ${delivery.delivery_address}
+                    </p>
+
+                    <p>
+                        <strong>Product:</strong>
+                        ${delivery.product_name}
+                    </p>
+
+                    <p>
+                        <strong>Variant:</strong>
+                        ${delivery.size_or_variant}
+                    </p>
+
+                    <p>
+                        <strong>Item:</strong>
+                        ${delivery.item_description}
+                    </p>
+
+                    <p>
+                        <strong>Quantity:</strong>
+                        ${delivery.quantity}
+                    </p>
+
+                    <p>
+                        <strong>Status:</strong>
+                        ${delivery.status}
+                    </p>
+
+                    <label
+                        for="rider-${delivery.delivery_id}"
+                    >
+                        Assign Rider:
+                    </label>
+
+                    <select
+                        id="rider-${delivery.delivery_id}"
+                    >
+
+                        <option value="">
+                            Select a rider
+                        </option>
+
+                        <option value="3">
+                            Brian Kamau
+                        </option>
+
+                        <option value="4">
+                            Faith Wanjiku
+                        </option>
+
+                        <option value="5">
+                            Kevin Ochieng
+                        </option>
+
+                    </select>
+
+                    <button
+                        class="assign-btn"
+                        data-id="${delivery.delivery_id}"
+                    >
+                        Assign Delivery
+                    </button>
+                `;
+
+
+                openDeliveriesContainer.appendChild(
+                    deliveryCard
+                );
+
+            });
+
+
+        } catch (error) {
+
+            console.error(
+                "Error loading deliveries:",
+                error
+            );
 
             openDeliveriesContainer.innerHTML =
-                "<p>No open delivery requests.</p>";
-
-            return;
+                "<p>Unable to load delivery requests.</p>";
         }
-
-        openDeliveries.forEach(function (delivery) {
-
-            const deliveryCard =
-                document.createElement("div");
-
-            deliveryCard.classList.add("delivery-card");
-
-            deliveryCard.innerHTML = `
-                <h3>${delivery.id}</h3>
-
-                <p>
-                    <strong>Customer:</strong>
-                    ${delivery.customerName}
-                </p>
-
-                <p>
-                    <strong>Phone:</strong>
-                    ${delivery.customerPhone}
-                </p>
-
-                <p>
-                    <strong>Address:</strong>
-                    ${delivery.address}
-                </p>
-
-                <p>
-                    <strong>Item:</strong>
-                    ${delivery.itemDescription}
-                </p>
-
-                <p>
-                    <strong>Status:</strong>
-                    ${delivery.status}
-                </p>
-
-                <label>
-                    Assign Rider:
-                </label>
-
-                <select id="rider-${delivery.id}">
-
-                    <option value="">
-                        Select a rider
-                    </option>
-
-                    <option value="rider-1">
-                        Brian
-                    </option>
-
-                    <option value="rider-2">
-                        Mary
-                    </option>
-
-                    <option value="rider-3">
-                        Kevin
-                    </option>
-
-                </select>
-
-                <button
-                    class="assign-btn"
-                    data-id="${delivery.id}"
-                >
-                    Assign Delivery
-                </button>
-            `;
-
-            openDeliveriesContainer.appendChild(
-                deliveryCard
-            );
-
-        });
 
     }
 
 
+
+    // ==========================================
+    // DISPATCHER
+    // ASSIGN RIDER
+    // ==========================================
+
     openDeliveriesContainer.addEventListener(
         "click",
-        function (event) {
+        async function (event) {
 
             if (
                 !event.target.classList.contains(
@@ -164,16 +316,19 @@ if (openDeliveriesContainer) {
                 return;
             }
 
+
             const deliveryId =
                 event.target.dataset.id;
+
 
             const riderSelect =
                 document.getElementById(
                     `rider-${deliveryId}`
                 );
 
+
             const riderId =
-                riderSelect.value;
+                Number(riderSelect.value);
 
 
             if (!riderId) {
@@ -186,34 +341,66 @@ if (openDeliveriesContainer) {
             }
 
 
-            const deliveries =
-                JSON.parse(
-                    localStorage.getItem("deliveries")
-                ) || [];
+            const assignment = {
+
+                rider_id: riderId,
+
+                assigned_by: 2
+
+            };
 
 
-            const delivery =
-                deliveries.find(
-                    delivery =>
-                        delivery.id === deliveryId
+            try {
+
+                const response = await fetch(
+
+                    `${API_BASE_URL}/deliveries/${deliveryId}/assign`,
+
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+
+                        body: JSON.stringify(assignment)
+                    }
+
                 );
 
 
-            if (delivery) {
-
-                delivery.riderId = riderId;
-
-                delivery.status = "ASSIGNED";
+                const data =
+                    await response.json();
 
 
-                localStorage.setItem(
-                    "deliveries",
-                    JSON.stringify(deliveries)
+                if (!response.ok) {
+
+                    throw new Error(
+                        data.error ||
+                        "Failed to assign delivery"
+                    );
+                }
+
+
+                alert(
+                    "Delivery assigned successfully!"
                 );
 
 
                 displayOpenDeliveries();
 
+
+            } catch (error) {
+
+                console.error(
+                    "Error assigning delivery:",
+                    error
+                );
+
+                alert(
+                    error.message ||
+                    "Unable to assign delivery."
+                );
             }
 
         }
