@@ -18,6 +18,7 @@ const pool = mysql.createPool({
 });
 
 app.use(express.json());
+app.use(cors());
 
 const validStatuses = new Set([
   'REQUESTED',
