@@ -1,0 +1,56 @@
+# Testing Evidence — Reflex
+
+Integration testing performed against the real database and API, not
+mocked. All results below are from an actual live run.
+
+## Setup verified
+
+- Ran `database/schema.sql` against a fresh MySQL/MariaDB instance —
+  completed with zero errors, created 8 tables.
+- Ran `database/seed.sql` — completed with zero errors, populated users,
+  retailers, products, and sample deliveries.
+- Started `server/server.js` and confirmed `/api/health` returns
+  `{"status":"ok","database":"connected"}`.
+
+## Core workflow — retailer → dispatcher → rider
+
+| Step | Action | Result |
+|---|---|---|
+| 1 | Retailer creates a delivery request (`POST /api/deliveries`) | `201` — delivery created with status `REQUESTED` |
+| 2 | Dispatcher views open deliveries (`GET /api/deliveries`) | New request visible in the list |
+| 3 | Dispatcher assigns it to a rider (`POST /api/deliveries/:id/assign`) | `201` — status moved to `ASSIGNED` |
+| 4 | Rider updates status to `PICKED_UP` (`POST /api/deliveries/:id/status`) | `201` — status updated |
+| 5 | Full history retrieved (`GET /api/deliveries/:id/history`) | Correctly shows all 3 status changes with timestamps and who made each one |
+
+Result: **the complete core workflow works correctly end-to-end.**
+
+## Edge cases tested
+
+| Case | Expected behavior | Actual result |
+|---|---|---|
+| Assign a delivery that's already assigned to someone | Should be rejected | Rejected with `409 Conflict` — "Delivery is not available for assignment" |
+| Rider tries to move status backward (e.g. `PICKED_UP` → `REQUESTED`) | Should be rejected | Rejected with `403 Forbidden` — "User cannot apply this status update" |
+| Rider tries to update status after delivery is already `DELIVERED` | Should be rejected | Rejected with `403 Forbidden` |
+| Rider scans to confirm delivery (`POST /api/deliveries/:id/confirm`) | Only the assigned rider can confirm | Succeeded (`201`) when called by the correct assigned rider |
+
+Result: **duplicate-assignment protection and status-transition rules both
+hold correctly under direct testing, not just in theory.**
+
+## Issue found and fixed during testing
+
+The database setup instructions did not account for a common MySQL/MariaDB
+default: the `root` account is often restricted to local-socket-only
+login, while the API connects over TCP (`127.0.0.1`). Following the
+original README exactly produces `Access denied for user 'root'`. Fix: a
+dedicated application database user must be created with TCP access
+explicitly granted. This has been corrected in the updated README (see
+below) so the next person to set this up doesn't hit the same wall.
+
+## Not yet tested
+
+- The three frontend pages (`retailer.html`, `dispatcher.html`,
+  `rider.html`) have not yet been verified to call the live API
+  correctly — testing so far covered the API directly.
+- Concurrent/simultaneous requests (e.g. two dispatchers assigning the
+  same delivery at the exact same instant) were not load-tested — only
+  sequential requests were verified.
