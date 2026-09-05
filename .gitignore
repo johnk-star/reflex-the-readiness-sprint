@@ -1,0 +1,8 @@
+server/node_modules/
+server/.env
+*.log
+
+# Local database exports and editor files
+*.sql.bak
+.DS_Store
+.vscode/
