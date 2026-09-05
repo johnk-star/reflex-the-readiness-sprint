@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Rider Dashboard | Reflex</title>
+
+    <link rel="stylesheet" href="../css/rider.css">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header class="topbar">
+        <div class="brand">
+            <h1>Reflex</h1>
+            <span>Rider Portal</span>
+        </div>
+
+        <div class="rider-info">
+            <span id="rider-name">Rider</span>
+            <span class="role">RIDER</span>
+        </div>
+    </header>
+
+
+    <!-- Main content -->
+    <main class="dashboard">
+
+        <!-- Dashboard heading -->
+        <section class="dashboard-header">
+
+            <div>
+                <h2>Rider Dashboard</h2>
+                <p>
+                    Manage your assigned deliveries and update their status.
+                </p>
+            </div>
+
+            <button id="refresh-btn" class="refresh-btn">
+                Refresh
+            </button>
+
+        </section>
+
+
+        <!-- Messages -->
+        <div id="message" class="message hidden"></div>
+
+
+        <!-- Statistics -->
+        <section class="stats">
+
+            <div class="stat-card">
+                <span class="stat-label">Assigned</span>
+                <strong id="assigned-count">0</strong>
+            </div>
+
+            <div class="stat-card">
+                <span class="stat-label">Picked Up</span>
+                <strong id="picked-up-count">0</strong>
+            </div>
+
+            <div class="stat-card">
+                <span class="stat-label">Delivered</span>
+                <strong id="delivered-count">0</strong>
+            </div>
+
+        </section>
+
+
+        <!-- Assigned deliveries -->
+        <section class="delivery-section">
+
+            <div class="section-heading">
+                <div>
+                    <h2>My Deliveries</h2>
+                    <p>Deliveries currently assigned to you.</p>
+                </div>
+            </div>
+
+
+            <div id="deliveries-container" class="deliveries-container">
+
+                <div class="loading">
+                    Loading deliveries...
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- Confirmation modal -->
+    <div id="confirmation-modal" class="modal hidden">
+
+        <div class="modal-content">
+
+            <button
+                id="close-modal"
+                class="close-modal"
+                type="button"
+            >
+                &times;
+            </button>
+
+            <h2>Confirm Delivery</h2>
+
+            <p>
+                Enter the customer's confirmation code to complete this
+                delivery.
+            </p>
+
+            <form id="confirmation-form">
+
+                <input
+                    type="hidden"
+                    id="confirmation-delivery-id"
+                >
+
+                <label for="confirmation-code">
+                    Confirmation Code
+                </label>
+
+                <input
+                    type="text"
+                    id="confirmation-code"
+                    placeholder="Enter confirmation code"
+                    required
+                    autocomplete="off"
+                >
+
+                <div class="confirmation-result">
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="confirmation-result"
+                            value="SUCCESSFUL"
+                            checked
+                        >
+
+                        Successful
+                    </label>
+
+                    <label>
+                        <input
+                            type="radio"
+                            name="confirmation-result"
+                            value="FAILED"
+                        >
+
+                        Failed
+                    </label>
+
+                </div>
+
+                <button
+                    type="submit"
+                    class="primary-btn"
+                >
+                    Submit Confirmation
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <script src="../js/rider.js"></script>
+
+</body>
+</html>
