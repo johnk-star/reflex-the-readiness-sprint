@@ -18,7 +18,6 @@ const pool = mysql.createPool({
 });
 
 app.use(express.json());
-app.use(cors());
 
 const validStatuses = new Set([
   'REQUESTED',
@@ -39,6 +38,11 @@ async function getUser(userId, connection = pool) {
   );
   return rows[0];
 }
+
+// Root route handler to fix "Cannot GET /"
+app.get('/', (request, response) => {
+  response.json({ message: 'Reflex API is running successfully!' });
+});
 
 app.get('/api/health', async (_request, response) => {
   try {
