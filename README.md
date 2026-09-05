@@ -55,3 +55,11 @@ invalid status transitions), all run against a live database and API.
 
 See `docs/DEMO_SCRIPT.md` for the walkthrough used in the live
 presentation.
+
+This project currently runs locally (see setup instructions above) and
+has been fully tested end-to-end against a real database and API — see
+`docs/TESTING_EVIDENCE.md` for the complete test log. A live public
+deployment was not completed in time for this submission; the fastest
+path identified was a free-tier MySQL host (Aiven) paired with a free
+Node host (Render), which is planned as the next step rather than a
+blocker to demonstrating the working system.
