@@ -39,7 +39,6 @@ async function getUser(userId, connection = pool) {
   return rows[0];
 }
 
-// Root route handler to fix "Cannot GET /"
 app.get('/', (request, response) => {
   response.json({ message: 'Reflex API is running successfully!' });
 });
