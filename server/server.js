@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const express = require('express');
+const cors = require('cors');
 const mysql = require('mysql2/promise');
 
 const app = express();
@@ -16,6 +17,7 @@ const pool = mysql.createPool({
 });
 
 app.use(express.json());
+app.use(cors());
 
 const validStatuses = new Set([
   'REQUESTED',
